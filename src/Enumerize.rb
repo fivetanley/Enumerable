@@ -121,5 +121,39 @@ module Enumerize
     counter
   end
 
+  def cycle( *cycles, &block )
+    cycles = cycles[ 0 ]
+    if !block_given?
+      return Enumerator.new do | yielder |
+        cycles.times do | num |
+          each do | thing |
+            yielder << thing
+          end
+        end
+      end
+    end
+    cycles.times do | num |
+      each do | thing |
+        block.call( thing )
+      end
+    end
+  end
+
+  def detect( *ifnone, &block )
+    if !block_given?
+      return Enumerator.new do |yielder|
+        each do | thing |
+          yielder << thing
+        end
+      end
+    end
+    ifnone = ifnone[ 0 ] unless ifnone.size == 0
+    each do | thing |
+      return thing unless block.call( thing ) != true
+    end
+    return ifnone.call
+
+  end
+
 end
 

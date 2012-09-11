@@ -273,7 +273,63 @@ describe "Enumerize" do
 
   describe "#cycle" do
 
-    context "when passed an n `times` argument" do
+    before :each do
+      @stub = stub()
+    end
+
+    context "when passed an n `times` argument and a block" do
+
+      it "should run through entire collection n times" do
+        @stub.should_receive( :foo ).exactly( 4 ).times
+        @collection.cycle( 2 ) { | thing | @stub.foo(thing) }
+      end
+    end
+
+    context "when passed an n `times` argument and no block" do
+
+      it "returns an enumerator that cycles n times" do
+        result = @collection.cycle( 2 )
+        expect( result.next ).to eq( 1 )
+        expect( result.next ).to eq( 2 )
+        expect( result.next ).to eq( 1 )
+        expect( result.next ).to eq( 2 )
+        expect{ result.next }.to raise_error( StopIteration )
+      end
+
+    end
+
+  end
+
+  describe "#detect #find" do
+
+    context "when passed an ifnone" do
+
+      context "when passed a block" do
+
+        it "returns the first thing that block result != false" do
+          stub = Proc.new { "buckets" }
+          result = @collection.detect( stub ) { |thing| thing == 2 }
+          expect(result).to eq( 2 )
+        end
+
+        it "calls the ifnone if the detection doesnt find an object" do
+          stub = Proc.new { "buckets" }
+          result = @collection.detect( stub ) { |thing| thing == 3 }
+          expect( result ).to eq( "buckets" )
+        end
+
+      end
+
+      context "when not passed a block" do
+
+        it "returns an enumerator" do
+          result = @collection.detect( stub )
+          expect( result.next ).to eq( 1 )
+          expect( result.next ).to eq( 2 )
+          expect{ result.next }.to raise_error( StopIteration )
+        end
+
+      end
 
     end
 
