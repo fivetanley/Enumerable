@@ -235,4 +235,47 @@ describe "Enumerize" do
     end
 
   end
+
+  describe "#count" do
+
+    context "when passed no parameters" do
+
+      before :each do
+        @result = @collection.count
+      end
+
+      it "should return the total amount of things in the collection" do
+        expect( @result ).to eq( 2 )
+      end
+
+    end
+
+    context "when passed an `item` argument" do
+
+      it "returns the total amount of things that equal the item" do
+        @collection.stub( :each ).and_yield( 1 ).and_yield(2 ).and_yield( 2 )
+        result = @collection.count( 2 )
+        expect( result ).to eq(2)
+      end
+
+    end
+
+    context "when passed a block" do
+
+      it "returns a count of everything where the block returns true" do
+        result = @collection.count { | thing | thing == 1 }
+        expect( result ).to eq( 1 )
+      end
+
+    end
+
+  end
+
+  describe "#cycle" do
+
+    context "when passed an n `times` argument" do
+
+    end
+
+  end
 end

@@ -105,5 +105,21 @@ module Enumerize
     flat_map( block )
   end
 
+  def count( *item, &block )
+    counter = 0
+    if item.size == 1
+      comparator = item[ 0 ]
+    end
+    each do | thing |
+      if block_given?
+        counter += 1 unless block.call( thing ) != true
+      else
+        item = comparator || thing
+        counter += 1 unless item != thing
+      end
+    end
+    counter
+  end
+
 end
 
