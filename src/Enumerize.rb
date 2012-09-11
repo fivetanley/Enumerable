@@ -50,4 +50,60 @@ module Enumerize
     end
     chunks
   end
+
+  def map( &block )
+    map = []
+    if !block_given?
+      enum = Enumerator.new do |yielder|
+        each do | thing |
+          yielder << thing
+        end
+      end
+      return enum
+    end
+    each do | thing |
+      map << block.call( thing )
+    end
+    map
+  end
+
+  def collect (&block)
+    map( &block )
+  end
+
+  def flat_map( &block )
+    def recursive_each( memo, list, block )
+      if list.respond_to?( 'each' )
+        list.each do | item |
+          recursive_each(memo, item, block)
+        end
+      else
+        if memo != nil
+          memo << block.call( list )
+        #handle yield
+        else
+          block << list
+        end
+      end
+    end
+    if !block_given?
+      Enumerator.new do |yielder|
+        each do | thing |
+          recursive_each( nil, thing, yielder )
+        end
+      end
+    else
+    flat_map = []
+      each do | thing |
+        recursive_each( flat_map, thing, block )
+      end
+      flat_map
+    end
+  end
+
+  def flat_collect( &block )
+    flat_map( block )
+  end
+
 end
+

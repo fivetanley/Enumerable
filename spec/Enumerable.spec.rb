@@ -172,5 +172,67 @@ describe "Enumerize" do
   end
 
   describe "#map #collect" do
+
+    context "when passed a block" do
+
+      before :each do
+        @result = @collection.map { | thing | thing + 1 }
+      end
+
+      it "returns an array with the transformation passed on each member" do
+        expect( @result ).to eq( [2,3] )
+      end
+    end
+
+    context "when not passed a block" do
+
+      before :each do
+        @result = @collection.map
+      end
+
+      it "returns an enmerator" do
+        expect( @result.next ).to eq( 1 )
+        expect( @result.next ).to eq( 2 )
+        expect{ @result.next }.to raise_error( StopIteration )
+      end
+
+    end
+
+  end
+
+  describe "#flat_map #flat_collect" do
+
+    before :each do
+      @collection.stub( :each ).and_yield([1,2]).and_yield([3,4])
+    end
+
+    context "when passed a block" do
+
+      before :each do
+        @result = @collection.flat_map { |thing| thing + 1 }
+      end
+
+      it "returns a flattened array w/results of block applied to each" do
+        expect( @result ).to eq( [2,3,4,5] )
+      end
+
+    end
+
+    context "when not passed a block" do
+
+      before :each do
+        @result = @collection.flat_map
+      end
+
+      it "returns an enumerator of a flattened version of each" do
+        expect( @result.next ).to eq(1)
+        expect( @result.next ).to eq(2)
+        expect( @result.next ).to eq(3)
+        expect( @result.next ).to eq(4)
+        expect{ @result.next }.to raise_error( StopIteration )
+      end
+
+    end
+
   end
 end
